@@ -1,0 +1,18 @@
+export type Role = 'Customer' | 'StoreManager' | 'Admin' | 'SuperAdmin'
+
+export type StoreStatus = 'pending' | 'verified' | 'rejected'
+export type InventoryStatus = 'active' | 'inactive' | 'out_of_stock'
+export type PartCondition = 'new' | 'used' | 'refurbished' | 'salvage'
+export type SubscriptionPlan = 'free' | 'basic' | 'premium'
+export type Origin =
+  | 'GCC'
+  | 'Iraq'
+  | 'USA'
+  | 'Japan'
+  | 'Europe'
+  | 'China'
+  | 'Korea'
+  | 'OEM'
+  | 'Aftermarket'
+  | 'Original'
+  | 'Compatible'

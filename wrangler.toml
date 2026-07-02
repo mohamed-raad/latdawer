@@ -1,0 +1,30 @@
+name = "latdawer"
+account_id = "d43f7724205e4f3d0bb7c454b8188ea9"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+main = ".open-next/worker.js"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "central-parts-finder-db"
+database_id = "a745ed24-591a-4369-9907-38ce1fd6770b"
+
+[[kv_namespaces]]
+binding = "KV_CACHE"
+id = "ed4da376a95a4c7db9efe33ca57115c2"
+
+[[r2_buckets]]
+binding = "R2_STORAGE"
+bucket_name = "central-parts-finder"
+
+[[r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "central-parts-finder"
+
+[alias]
+"critters" = "./stubs/empty.js"
+"@opentelemetry/api" = "./stubs/empty.js"
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
