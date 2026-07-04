@@ -1,0 +1,7 @@
+const CACHE_NAME = 'latdawer-v1'
+const STATIC_ASSETS = ['/', '/search', '/vehicles', '/login', '/signup', '/offline']
+self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(STATIC_ASSETS))); self.skipWaiting() })
+self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))); self.clients.claim() })
+self.addEventListener('fetch', (e) => { if (e.request.method !== 'GET' || e.request.url.includes('/api/')) return; e.respondWith(caches.match(e.request).then((c) => { const f = fetch(e.request).then((r) => { if (r.ok) { const cl = r.clone(); caches.open(CACHE_NAME).then((ca) => ca.put(e.request, cl)) } return r }).catch(() => { if (e.request.mode === 'navigate') return caches.match('/offline'); return c }); return c || f })) })
+self.addEventListener('push', (e) => { const d = e.data?.json() || {}; e.waitUntil(self.registration.showNotification(d.title || 'لاتدور', { body: d.body || 'لديك تحديث جديد', icon: '/icon-192.png', badge: '/icon-192.png', vibrate: [100, 50, 100], data: d.url || '/', tag: d.tag || 'latdawer-notification', renotify: true })) })
+self.addEventListener('notificationclick', (e) => { e.notification.close(); e.waitUntil(self.clients.matchAll({ type: 'window' }).then((c) => { for (const cl of c) { if (cl.url.includes(self.registration.scope) && 'focus' in cl) return cl.focus() } return self.clients.openWindow(e.notification.data || '/') })) })

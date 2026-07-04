@@ -20,6 +20,7 @@ import { transactionsRouter } from '@/features/transactions/router'
 import { disputesRouter } from '@/features/disputes/router'
 import { onboardingRouter } from '@/features/stores/onboarding-router'
 import { workflowRouter } from '@/features/ai/workflow-router'
+import { paymentRouter } from '@/features/subscriptions/payment-router'
 
 export const appRouter = router({
   search: searchRouter,
@@ -43,6 +44,7 @@ export const appRouter = router({
   disputes: disputesRouter,
   onboarding: onboardingRouter,
   workflows: workflowRouter,
+  payments: paymentRouter,
 })
 
 export type AppRouter = typeof appRouter

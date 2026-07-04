@@ -8,4 +8,5 @@ export { priceAlerts, storeAds, notifications, loyaltyPoints, loyaltyTransaction
 export { aiAgents, aiAgentLogs } from './agent'
 export { storeManufacturers, storeVehicles, storeCategories } from './store-specializations'
 export { transactions, disputes, partGuarantees, referrals, socialShares, forumPosts, forumComments, userReputation, userBadges, dailyDeals, promotions, storeScores, suppliers, supplierProducts, wholesaleOrders, customerSegments, abTests } from './advanced'
+export { payments } from './payments'
 export type { Role, StoreStatus, InventoryStatus, PartCondition, SubscriptionPlan, Origin } from './types'
