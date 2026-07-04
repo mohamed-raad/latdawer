@@ -13,12 +13,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
 
-      - run: npx open-next build
+      - name: Build for Cloudflare
+        run: npx @opennextjs/cloudflare build
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
