@@ -187,25 +187,20 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Recent Activity */}
-      {!isAdmin && (
+      {/* Recent Activity - only show if there's actual data */}
+      {!isAdmin && myRequests && myRequests.total > 0 && (
         <div>
-          <h2 className="text-lg font-bold mb-4">آخر النشاطات</h2>
+          <h2 className="text-lg font-bold mb-4">آخر الطلبات</h2>
           <div className="rounded-2xl border divide-y">
-            {[
-              { icon: '🔍', text: 'بحثت عن: بطانة فرامل أمامية', time: 'منذ 5 دقائق' },
-              { icon: '💬', text: 'تواصلت مع متجر الراشد', time: 'منذ ساعة' },
-              { icon: '📦', text: 'تم إضافة: فلتر زيت تويوتا', time: 'منذ يوم' },
-            ].map((activity, i) => (
-              <div key={i} className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-lg">
-                  {activity.icon}
-                </div>
+            {myRequests.results?.slice(0, 5).map((req: { id: string; title: string; status: string; createdAt: Date }) => (
+              <Link key={req.id} href={`/requests/${req.id}`}
+                className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-lg">📋</div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{activity.text}</p>
-                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  <p className="text-sm font-medium">{req.title}</p>
+                  <p className="text-xs text-muted-foreground">{req.status === 'open' ? 'مفتوح' : req.status === 'closed' ? 'مغلق' : req.status}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

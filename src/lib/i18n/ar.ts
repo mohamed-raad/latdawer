@@ -193,7 +193,6 @@ const ar: Dict = {
   outOfStock: 'نفد',
   quantity: 'الكمية',
   price: 'السعر',
-  status: 'الحالة',
   active: 'متوفر',
   inactive: 'غير متوفر',
   outOfStock_: 'نفد',

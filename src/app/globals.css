@@ -129,3 +129,26 @@ html {
 .border-glow:hover::before {
   opacity: 0.1;
 }
+
+/* Dark mode form elements */
+.dark select, .dark input, .dark textarea {
+  color-scheme: dark;
+}
+.dark select option, .dark select optgroup {
+  background-color: #18181b;
+  color: #fafafa;
+}
+.dark select:focus, .dark input:focus, .dark textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+select option {
+  padding: 8px 12px;
+  background-color: #ffffff;
+  color: #0a0a0a;
+}
+.dark select option, .dark select optgroup {
+  background-color: #18181b;
+  color: #fafafa;
+  padding: 8px 12px;
+}

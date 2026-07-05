@@ -3,12 +3,14 @@ import type { NextRequest } from 'next/server'
 
 
 const SECURITY_HEADERS: Record<string, string> = {
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://plausible.io https://cdn.worldvectorlogo.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://plausible.io https://api.stripe.com; frame-ancestors 'none'; sandbox allow-forms allow-scripts allow-same-origin",
+  'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
+  'X-Permitted-Cross-Domain-Policies': 'none',
+  'Referrer-Policy': 'no-referrer',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self), payment=(self)',
   'X-XSS-Protection': '1; mode=block',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self)',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 }
 
 export function addSecurityHeaders(response: NextResponse): NextResponse {

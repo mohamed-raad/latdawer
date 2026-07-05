@@ -22,6 +22,28 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // Input validation for request body
+  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    const contentType = req.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
+      try {
+        const clonedReq = req.clone()
+        const body = await clonedReq.text()
+        if (detectSQLInjection(body) || detectXSS(body)) {
+          return NextResponse.json(
+            { error: 'Invalid input detected' },
+            { status: 400 }
+          )
+        }
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid request body' },
+          { status: 400 }
+        )
+      }
+    }
+  }
+
   // CSRF protection for mutation requests
   if (csrfProtectedMethods.includes(req.method)) {
     const isApiRoute = pathname.startsWith('/api/')

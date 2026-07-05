@@ -8,14 +8,18 @@ import { ToggleButtons } from '@/components/toggle-buttons'
 import { NotificationBell } from '@/components/notification-bell'
 
 const POPULAR_MAKES = [
-  { name: 'Toyota', nameAr: 'تويوتا', emoji: '🇯🇵', color: 'from-red-500 to-red-600' },
-  { name: 'Nissan', nameAr: 'نيسان', emoji: '🇯🇵', color: 'from-red-600 to-red-700' },
-  { name: 'Hyundai', nameAr: 'هيونداي', emoji: '🇰🇷', color: 'from-blue-500 to-blue-600' },
-  { name: 'Kia', nameAr: 'كيا', emoji: '🇰🇷', color: 'from-red-500 to-orange-500' },
-  { name: 'Chevrolet', nameAr: 'شيفروليه', emoji: '🇺🇸', color: 'from-yellow-500 to-yellow-600' },
-  { name: 'Ford', nameAr: 'فورد', emoji: '🇺🇸', color: 'from-blue-600 to-blue-700' },
-  { name: 'BMW', nameAr: 'بي ام دبليو', emoji: '🇩🇪', color: 'from-blue-500 to-cyan-500' },
-  { name: 'Mercedes', nameAr: 'مرسيدس', emoji: '🇩🇪', color: 'from-gray-600 to-gray-700' },
+  { name: 'Toyota', nameAr: 'تويوتا', logo: 'https://cdn.worldvectorlogo.com/logos/toota-4.svg' },
+  { name: 'Nissan', nameAr: 'نيسان', logo: 'https://cdn.worldvectorlogo.com/logos/nissan-6.svg' },
+  { name: 'Hyundai', nameAr: 'هيونداي', logo: 'https://cdn.worldvectorlogo.com/logos/hyundai-6.svg' },
+  { name: 'Kia', nameAr: 'كيا', logo: 'https://cdn.worldvectorlogo.com/logos/kia-2.svg' },
+  { name: 'Chevrolet', nameAr: 'شيفروليه', logo: 'https://cdn.worldvectorlogo.com/logos/chevrolet-6.svg' },
+  { name: 'Ford', nameAr: 'فورد', logo: 'https://cdn.worldvectorlogo.com/logos/ford-6.svg' },
+  { name: 'BMW', nameAr: 'بي ام دبليو', logo: 'https://cdn.worldvectorlogo.com/logos/bmw-2.svg' },
+  { name: 'Mercedes', nameAr: 'مرسيدس', logo: 'https://cdn.worldvectorlogo.com/logos/mercedes-benz-9.svg' },
+  { name: 'Honda', nameAr: 'هوندا', logo: 'https://cdn.worldvectorlogo.com/logos/honda-1.svg' },
+  { name: 'Mitsubishi', nameAr: 'ميتسوبيشي', logo: 'https://cdn.worldvectorlogo.com/logos/mitsubishi-2.svg' },
+  { name: 'Suzuki', nameAr: 'سوزوكي', logo: 'https://cdn.worldvectorlogo.com/logos/suzuki-1.svg' },
+  { name: 'Mazda', nameAr: 'مازدا', logo: 'https://cdn.worldvectorlogo.com/logos/mazda-2.svg' },
 ]
 
 const HOW_IT_WORKS = [
@@ -127,12 +131,12 @@ export default function Home() {
         {/* Popular Makes */}
         <section className="mx-auto max-w-7xl px-4 py-12">
           <h3 className="text-lg font-bold mb-6">{t('popularMakes')}</h3>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3">
             {POPULAR_MAKES.map((make) => (
               <Link key={make.name} href={`/search?q=${make.nameAr}`}
                 className="group flex flex-col items-center gap-2 rounded-2xl border p-4 hover:shadow-lg hover:border-foreground/20 transition-all duration-200">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${make.color} text-white text-xl shadow-sm group-hover:scale-110 transition-transform`}>
-                  {make.emoji}
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white p-2 shadow-sm group-hover:scale-110 transition-transform">
+                  <img src={make.logo} alt={make.name} className="h-full w-full object-contain" loading="lazy" />
                 </div>
                 <span className="text-xs font-medium text-center">{make.nameAr}</span>
               </Link>
@@ -154,30 +158,6 @@ export default function Home() {
                   <p className="mt-2 text-sm text-muted-foreground">{item.descAr}</p>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Bar */}
-        <section className="border-t">
-          <div className="mx-auto max-w-7xl px-4 py-12">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-              <div>
-                <p className="text-3xl font-bold">+15</p>
-                <p className="text-sm text-muted-foreground mt-1">مدينة عراقية</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold">+100</p>
-                <p className="text-sm text-muted-foreground mt-1">متجر موثق</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold">+10,000</p>
-                <p className="text-sm text-muted-foreground mt-1">قطعة غيار</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold">+50,000</p>
-                <p className="text-sm text-muted-foreground mt-1">مستخدم نشط</p>
-              </div>
             </div>
           </div>
         </section>
