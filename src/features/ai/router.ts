@@ -162,41 +162,46 @@ export const aiRouter = router({
       modelId: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const { conversationId, content, modelId } = input
+      try {
+        const { conversationId, content, modelId } = input
 
-      const conversation = await getConversation(conversationId)
-      if (!conversation || conversation.userId !== ctx.userId) {
-        throw new TRPCError({ code: 'NOT_FOUND' })
-      }
-
-      const hasLimit = await checkUsageLimit(ctx.userId!, 50)
-      if (!hasLimit) {
-        throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'Usage limit exceeded' })
-      }
-
-      await addMessage(conversationId, 'user', content)
-
-      const systemPrompt = await getSystemPrompt()
-
-      const aiResponse = await generateAIResponse(systemPrompt, content, conversationId, modelId)
-
-      const aiMessage = await addMessage(conversationId, 'assistant', aiResponse.content, {
-        model: aiResponse.model,
-        tokensUsed: aiResponse.tokensUsed,
-        modelId: modelId || null,
-      })
-
-      if (aiResponse.photoSearches && aiResponse.photoSearches.length > 0) {
-        for (const photo of aiResponse.photoSearches) {
-          await addPhotoSuggestion(aiMessage.id, photo.url, photo.source, photo.searchTerm)
+        const conversation = await getConversation(conversationId)
+        if (!conversation || conversation.userId !== ctx.userId) {
+          throw new TRPCError({ code: 'NOT_FOUND' })
         }
-      }
 
-      await recordUsage(ctx.userId!, modelId || 'default', aiResponse.tokensUsed || 0)
+        const hasLimit = await checkUsageLimit(ctx.userId!, 50)
+        if (!hasLimit) {
+          throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'Usage limit exceeded' })
+        }
 
-      return {
-        message: aiMessage,
-        photos: aiResponse.photoSearches || [],
+        await addMessage(conversationId, 'user', content)
+
+        const systemPrompt = await getSystemPrompt()
+
+        const aiResponse = await generateAIResponse(systemPrompt, content, conversationId, modelId)
+
+        const aiMessage = await addMessage(conversationId, 'assistant', aiResponse.content, {
+          model: aiResponse.model,
+          tokensUsed: aiResponse.tokensUsed,
+          modelId: modelId || null,
+        })
+
+        if (aiResponse.photoSearches && aiResponse.photoSearches.length > 0) {
+          for (const photo of aiResponse.photoSearches) {
+            await addPhotoSuggestion(aiMessage.id, photo.url, photo.source, photo.searchTerm)
+          }
+        }
+
+        await recordUsage(ctx.userId!, modelId || 'default', aiResponse.tokensUsed || 0)
+
+        return {
+          message: aiMessage,
+          photos: aiResponse.photoSearches || [],
+        }
+      } catch (error) {
+        console.error('sendMessage error:', error)
+        throw error
       }
     }),
 
