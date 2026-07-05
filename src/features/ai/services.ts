@@ -1,5 +1,6 @@
 import { db } from '@/db'
 import { aiProviders, aiModels, aiUsage, aiConversations, aiMessages, aiPhotoSuggestions, aiKnowledgeBase } from '@/db/schema'
+import { parts as aiParts, inventory as aiInventory } from '@/db/schema'
 import { eq, and, sql, desc } from 'drizzle-orm'
 import { encryptApiKey, maskApiKey } from '@/lib/encryption'
 
@@ -258,13 +259,14 @@ export async function generateAIResponse(
   conversationId: string,
   modelId?: string
 ): Promise<AIResponse> {
-  const messages = await getMessages(conversationId)
-  const history = messages.map((m) => ({
-    role: m.role,
-    content: m.content,
-  }))
+  // Try rule-based processing first for common store operations
+  const ruleBasedResponse = await processWithRules(userMessage, conversationId)
+  if (ruleBasedResponse) return ruleBasedResponse
 
-  // Find the model to use
+  // Fall back to LLM API
+  const messages = await getMessages(conversationId)
+  const history = messages.map((m) => ({ role: m.role, content: m.content }))
+
   const targetModelId = modelId
   let providerSlug = 'groq'
   let apiKey: string | null = null
@@ -303,11 +305,141 @@ export async function generateAIResponse(
   } catch (error) {
     console.error('AI response generation failed', error)
     return {
-      content: 'شلونك! شكو ماكو؟ أنا هنا أساعدك إدارة متجرك.',
+      content: 'شلونك! شكو ماكو؟ أنا هنا أساعدك إدارة متجرك. إذا تريد تضيف قطع، قولي القطعة وسعرها وأضيفها لمتجرك.',
       model: 'fallback',
       tokensUsed: 0,
     }
   }
+}
+
+// ─── Rule-Based Store Operations ───
+async function processWithRules(userMessage: string, conversationId: string): Promise<AIResponse | null> {
+  const lowerMsg = userMessage.toLowerCase()
+
+  // Check if user wants to add parts
+  if (lowerMsg.includes('أضف') || lowerMsg.includes('ضيف') || lowerMsg.includes('add') || lowerMsg.includes('إضافة')) {
+    // Get conversation context to find store info
+    const conv = await getConversation(conversationId)
+    if (!conv) return null
+
+    // Try to extract part info from the message
+    const parts = await db.select().from(aiParts).limit(50)
+    const matchedParts: Array<{ part: typeof parts[0]; quantity: number; price: number }> = []
+
+    for (const part of parts) {
+      const nameAr = (part.nameAr || '').toLowerCase()
+      const nameEn = (part.nameEn || '').toLowerCase()
+      const partNumber = (part.partNumber || '').toLowerCase()
+
+      if (lowerMsg.includes(nameAr) || lowerMsg.includes(nameEn) || lowerMsg.includes(partNumber)) {
+        // Try to extract price and quantity from message
+        const priceMatch = userMessage.match(/(\d+)\s*(دينار|iqd|د\.ع)/i) || userMessage.match(/(\d{3,})/)
+        const qtyMatch = userMessage.match(/(\d+)\s*(قطعة|حبت| Stück)/i) || userMessage.match(/×(\d+)/)
+
+        matchedParts.push({
+          part,
+          quantity: qtyMatch ? parseInt(qtyMatch[1]) : 10,
+          price: priceMatch ? parseInt(priceMatch[1]) : 25000,
+        })
+      }
+    }
+
+    if (matchedParts.length > 0) {
+      let addedCount = 0
+      const addedNames: string[] = []
+
+      for (const mp of matchedParts) {
+        // Check if already in inventory
+        const existing = await db.select().from(aiInventory)
+          .where(and(eq(aiInventory.partId, mp.part.id), eq(aiInventory.storeId, conv.storeId || '')))
+          .limit(1)
+
+        if (existing.length === 0) {
+          await db.insert(aiInventory).values({
+            id: crypto.randomUUID(),
+            partId: mp.part.id,
+            storeId: conv.storeId || '',
+            price: mp.price,
+            currency: 'IQD',
+            quantity: mp.quantity,
+            condition: 'new',
+            status: 'active',
+            notesAr: mp.part.nameAr,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          addedCount++
+          addedNames.push(mp.part.nameAr)
+        }
+      }
+
+      if (addedCount > 0) {
+        return {
+          content: `تم إضافة ${addedCount} قطعة لمتجرك بنجاح! ✅\n\nالقطع المضافة:\n${addedNames.map(n => `• ${n}`).join('\n')}\n\nتقدر تشوفها في صفحة المخزون.`,
+          model: 'rule-based',
+          tokensUsed: 0,
+        }
+      } else {
+        return {
+          content: 'القطع هذي موجودة بالفعل في متجرك. إذا تريد تغير السعر أو الكمية، قولي القطعة والسعر الجديد.',
+          model: 'rule-based',
+          tokensUsed: 0,
+        }
+      }
+    }
+
+    return {
+      content: 'ما لقيت القطعة بالرسالة. حاول تكتب اسم القطعة بالعربي أو الإنجليزي مثل: أضف فلتر زيت تويوتا 15000 دينار 20 قطعة',
+      model: 'rule-based',
+      tokensUsed: 0,
+    }
+  }
+
+  // Check if user wants to see inventory
+  if (lowerMsg.includes('مخزون') || lowerMsg.includes('inventory') || lowerMsg.includes('عرض') || lowerMsg.includes('شوف')) {
+    const conv = await getConversation(conversationId)
+    if (!conv) return null
+
+    const inventory = await db.select({
+      partName: aiParts.nameAr,
+      price: aiInventory.price,
+      quantity: aiInventory.quantity,
+    })
+      .from(aiInventory)
+      .innerJoin(aiParts, eq(aiInventory.partId, aiParts.id))
+      .where(eq(aiInventory.storeId, conv.storeId || ''))
+      .limit(20)
+
+    if (inventory.length === 0) {
+      return {
+        content: 'ماكو قطع في مخزونك حالياً. إذا تريد تضيف قطع، قولي القطعة وسعرها.',
+        model: 'rule-based',
+        tokensUsed: 0,
+      }
+    }
+
+    const list = inventory.map((item, i) =>
+      `${i + 1}. ${item.partName} - ${item.price.toLocaleString()} د.ع (${item.quantity} قطعة)`
+    ).join('\n')
+
+    return {
+      content: `مخزونك الحالي (${inventory.length} قطعة):\n\n${list}\n\nإذا تريد تغير سعر أو كمية أي قطعة، قولي القطعة والسعر الجديد.`,
+      model: 'rule-based',
+      tokensUsed: 0,
+    }
+  }
+
+  // Check if user wants to update price
+  if (lowerMsg.includes('سعر') && (lowerMsg.includes('غير') || lowerMsg.includes('حدث') || lowerMsg.includes('update') || lowerMsg.includes('change'))) {
+    return {
+      content: 'كتبلي اسم القطعة والسعر الجديد وأغيره لك. مثال: غيّر سعر فلتر زيت إلى 20000 دينار',
+      model: 'rule-based',
+      tokensUsed: 0,
+    }
+  }
+
+  // Default: no rule matched
+  return null
 }
 
 async function callProviderAPI(
