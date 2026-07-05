@@ -279,9 +279,16 @@ export async function generateAIResponse(
   conversationId: string,
   modelId?: string
 ): Promise<AIResponse> {
+  console.log(`[AI] generateAIResponse called: message="${userMessage}", conversationId="${conversationId}"`)
+
   // Try rule-based processing first for common store operations
   const ruleBasedResponse = await processWithRules(userMessage, conversationId)
-  if (ruleBasedResponse) return ruleBasedResponse
+  if (ruleBasedResponse) {
+    console.log(`[AI] Rule-based response: "${ruleBasedResponse.content.substring(0, 100)}..."`)
+    return ruleBasedResponse
+  }
+
+  console.log('[AI] No rule matched, falling back to LLM API')
 
   // Fall back to LLM API
   const messages = await getMessages(conversationId)
@@ -298,23 +305,26 @@ export async function generateAIResponse(
       if (provider) {
         providerSlug = provider.slug
         apiKey = await getProviderApiKey(provider.id)
+        console.log(`[AI] Using provider: ${provider.slug}, apiKey present: ${!!apiKey}`)
       }
     }
   }
 
   if (!apiKey) {
-    // Try Cloudflare secrets first, then env vars
     apiKey = process.env.GROQ_API_KEY || ''
-    if (!apiKey) providerSlug = 'groq'
+    providerSlug = 'groq'
+    console.log(`[AI] Fallback to Groq, apiKey present: ${!!apiKey}, key length: ${apiKey.length}`)
   }
 
   try {
+    console.log(`[AI] Calling ${providerSlug} API with model: ${targetModelId ? 'custom' : 'llama3-8b-8192'}`)
     const response = await callProviderAPI(providerSlug, apiKey, {
       systemPrompt,
       messages: [...history.slice(-10), { role: 'user', content: userMessage }],
       model: targetModelId ? undefined : 'llama3-8b-8192',
     })
 
+    console.log(`[AI] LLM response received: "${response.content.substring(0, 100)}..."`)
     const photoSearches = extractPhotoSearches(response.content)
 
     return {
@@ -324,7 +334,7 @@ export async function generateAIResponse(
       photoSearches,
     }
   } catch (error) {
-    console.error('AI response generation failed', error)
+    console.error('[AI] LLM API failed:', error instanceof Error ? error.message : error)
     return {
       content: 'شلونك! شكو ماكو؟ أنا هنا أساعدك إدارة متجرك. إذا تريد تضيف قطع، قولي القطعة وسعرها وأضيفها لمتجرك.',
       model: 'fallback',
