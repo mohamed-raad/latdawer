@@ -5,18 +5,18 @@ import { eq, and, isNull } from 'drizzle-orm'
 interface PhotoResult { url: string; source: string }
 
 const VEHICLE_IMAGES: Record<string, string> = {
-  'Toyota': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Toyota_logo.svg/512px-Toyota_logo.svg.png',
-  'Nissan': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Nissan_logo_%282020%29.svg/512px-Nissan_logo_%282020%29.svg.png',
-  'Hyundai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Hyundai_Motor_Company_logo.svg/512px-Hyundai_Motor_Company_logo.svg.png',
-  'Kia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Kia_logo.svg/512px-Kia_logo.svg.png',
-  'Chevrolet': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Chevrolet-logo.png/512px-Chevrolet-logo.png',
-  'Ford': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Ford_Motor_Company_Logo.svg/512px-Ford_Motor_Company_Logo.svg.png',
-  'BMW': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/BMW.svg/512px-BMW.svg.png',
-  'Mercedes': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Mercedes-Benz-logo-notext.svg/512px-Mercedes-Benz-logo-notext.svg.png',
-  'Honda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Honda.svg/512px-Honda.svg.png',
-  'Mitsubishi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mitsubishi_logo.svg/512px-Mitsubishi_logo.svg.png',
-  'Suzuki': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/S_logo.svg/512px-S_logo.svg.png',
-  'Mazda': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Mazda_logo_%282018%29.svg/512px-Mazda_logo_%282018%29.svg.png',
+  'Toyota': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/toyota-logo.jpg',
+  'Nissan': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/nissan-logo.jpg',
+  'Hyundai': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/hyundai-logo.jpg',
+  'Kia': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/kia-logo.jpg',
+  'Chevrolet': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/chevrolet-logo.jpg',
+  'Ford': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/ford-logo.jpg',
+  'BMW': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/bmw-logo.jpg',
+  'Mercedes': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/mercedes-logo.jpg',
+  'Honda': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/honda-logo.jpg',
+  'Mitsubishi': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/mitsubishi-logo.jpg',
+  'Suzuki': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/suzuki-logo.jpg',
+  'Mazda': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/mazda-logo.jpg',
 }
 
 const PART_TYPE_IMAGES: Record<string, string> = {
