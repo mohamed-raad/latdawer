@@ -31,6 +31,7 @@ export default function AIAssistantPage() {
 
   const sendMessageMutation = trpc.ai.sendMessage.useMutation({
     onSuccess: () => {
+      setInput('')
       refetchMessages()
       setSending(false)
     },
@@ -45,7 +46,6 @@ export default function AIAssistantPage() {
     if (!input.trim() || !conversationId || sending) return
     setSending(true)
     sendMessageMutation.mutate({ conversationId, content: input.trim() })
-    setInput('')
   }
 
   const handleNewChat = () => {
