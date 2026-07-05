@@ -301,7 +301,7 @@ export async function generateAIResponse(
       photoSearches,
     }
   } catch (error) {
-    logger.error('AI response generation failed', error as Error)
+    console.error('AI response generation failed', error)
     return {
       content: 'شلونك! شكو ماكو؟ أنا هنا أساعدك إدارة متجرك.',
       model: 'fallback',
