@@ -6,6 +6,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Central Parts Finder — Agent Guide
 
+## Core Working Principles
+
+1. **Ask, don't assume.** If something is unclear, ask before writing a single line. Never make silent assumptions about intent, architecture, or requirements. When running unattended, pick the most reasonable interpretation, proceed, and record the assumption rather than blocking.
+
+2. **Implement the simplest solution for simple problems, better solutions for harder problems.** Do not over-engineer or add flexibility that isn't needed yet.
+
+3. **Don't touch unrelated code.** But do surface bad code or design smells you discover so we can address them as a separate issue.
+
+4. **Flag uncertainty explicitly.** If you're unsure about something, see point 1. If it makes sense to do so, conduct a small, localised and low-risk experiment and bring the hypothesis and results to discuss. Confidence without certainty causes more damage than admitting a gap.
+
+5. **Suggest better ways.** I'm always open to ideas on better ways to do things. If you see a clearly better approach, say so before implementing. Explain the tradeoff in 2-4 bullets. If the current request is still reasonable, proceed unless the alternative avoids serious risk or wasted work. If the current request is safe but suboptimal, flag the better path briefly and still proceed. If the current request risks wasting work, breaking tests, touching wrong files, or locking in bad architecture, stop and ask. Style preferences or tiny refactors should not pause the whole run.
+
 ## Tech stack
 Next.js 16 (App Router) + TypeScript strict + Tailwind CSS v4 + Shadcn UI  
 tRPC v11 + React Query + TanStack Table  
