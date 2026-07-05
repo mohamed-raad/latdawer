@@ -4,19 +4,38 @@ import { eq, and, isNull } from 'drizzle-orm'
 
 interface PhotoResult { url: string; source: string }
 
+// All images use placehold.co which works from Cloudflare Workers
 const VEHICLE_IMAGES: Record<string, string> = {
-  'Toyota': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/toyota-logo.jpg',
-  'Nissan': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/nissan-logo.jpg',
-  'Hyundai': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/hyundai-logo.jpg',
-  'Kia': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/kia-logo.jpg',
-  'Chevrolet': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/chevrolet-logo.jpg',
-  'Ford': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/ford-logo.jpg',
-  'BMW': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/bmw-logo.jpg',
-  'Mercedes': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/mercedes-logo.jpg',
-  'Honda': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/honda-logo.jpg',
-  'Mitsubishi': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/mitsubishi-logo.jpg',
-  'Suzuki': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/suzuki-logo.jpg',
-  'Mazda': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/mazda-logo.jpg',
+  'Toyota': 'https://placehold.co/400x400/1a5276/ffffff?text=Toyota',
+  'Nissan': 'https://placehold.co/400x400/c0392b/ffffff?text=Nissan',
+  'Hyundai': 'https://placehold.co/400x400/2980b9/ffffff?text=Hyundai',
+  'Kia': 'https://placehold.co/400x400/e74c3c/ffffff?text=Kia',
+  'Chevrolet': 'https://placehold.co/400x400/f39c12/ffffff?text=Chevrolet',
+  'Ford': 'https://placehold.co/400x400/2c3e50/ffffff?text=Ford',
+  'BMW': 'https://placehold.co/400x400/3498db/ffffff?text=BMW',
+  'Mercedes': 'https://placehold.co/400x400/95a5a6/ffffff?text=Mercedes',
+  'Honda': 'https://placehold.co/400x400/e67e22/ffffff?text=Honda',
+  'Mitsubishi': 'https://placehold.co/400x400/e74c3c/ffffff?text=Mitsubishi',
+  'Suzuki': 'https://placehold.co/400x400/1abc9c/ffffff?text=Suzuki',
+  'Mazda': 'https://placehold.co/400x400/c0392b/ffffff?text=Mazda',
+}
+
+const PART_TYPE_IMAGES: Record<string, string> = {
+  'alternator': 'https://placehold.co/400x400/2c3e50/ffffff?text=Alternator',
+  'battery': 'https://placehold.co/400x400/27ae60/ffffff?text=Battery',
+  'filter': 'https://placehold.co/400x400/3498db/ffffff?text=Filter',
+  'spark plug': 'https://placehold.co/400x400/e74c3c/ffffff?text=Spark+Plug',
+  'brake': 'https://placehold.co/400x400/e67e22/ffffff?text=Brake',
+  'belt': 'https://placehold.co/400x400/1abc9c/ffffff?text=Belt',
+  'pulley': 'https://placehold.co/400x400/9b59b6/ffffff?text=Pulley',
+  'wiper': 'https://placehold.co/400x400/34495e/ffffff?text=Wiper',
+  'bulb': 'https://placehold.co/400x400/f1c40f/ffffff?text=Bulb',
+  'oil': 'https://placehold.co/400x400/7f8c8d/ffffff?text=Oil',
+  'radiator': 'https://placehold.co/400x400/16a085/ffffff?text=Radiator',
+  'starter': 'https://placehold.co/400x400/2ecc71/ffffff?text=Starter',
+  'clutch': 'https://placehold.co/400x400/8e44ad/ffffff?text=Clutch',
+  'shock': 'https://placehold.co/400x400/d35400/ffffff?text=Shock',
+  'spring': 'https://placehold.co/400x400/27ae60/ffffff?text=Spring',
 }
 
 const PART_TYPE_IMAGES: Record<string, string> = {
