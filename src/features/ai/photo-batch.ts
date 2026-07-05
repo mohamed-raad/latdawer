@@ -32,12 +32,31 @@ const PART_TYPE_IMAGES: Record<string, string> = {
 
 export async function fetchPhotosForPart(partNameAr: string, partNameEn: string | null, partNumber: string | null, make: string, model: string, year: string, _category: string | null): Promise<PhotoResult[]> {
   const results: PhotoResult[] = []
-  try { const wikiPhotos = await searchWikipediaImages(partNameEn || partNameAr, make, model); results.push(...wikiPhotos) } catch {}
-  if (results.length === 0 && make && VEHICLE_IMAGES[make]) results.push({ url: VEHICLE_IMAGES[make], source: 'manufacturer_logo' })
-  if (results.length === 0 && partNameEn) {
-    const lowerName = partNameEn.toLowerCase()
-    for (const [type, url] of Object.entries(PART_TYPE_IMAGES)) { if (lowerName.includes(type)) { results.push({ url, source: 'part_type' }); break } }
+
+  // 1. Try manufacturer logo first (always works)
+  if (make && VEHICLE_IMAGES[make]) {
+    results.push({ url: VEHICLE_IMAGES[make], source: 'manufacturer_logo' })
   }
+
+  // 2. Try part type image (always works)
+  if (partNameEn) {
+    const lowerName = partNameEn.toLowerCase()
+    for (const [type, url] of Object.entries(PART_TYPE_IMAGES)) {
+      if (lowerName.includes(type)) {
+        results.push({ url, source: 'part_type' })
+        break
+      }
+    }
+  }
+
+  // 3. Try Wikipedia (may fail on CF Workers)
+  try {
+    const wikiPhotos = await searchWikipediaImages(partNameEn || partNameAr, make, model)
+    results.push(...wikiPhotos)
+  } catch {
+    // Continue with what we have
+  }
+
   return results.slice(0, 5)
 }
 
