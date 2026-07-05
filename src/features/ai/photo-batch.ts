@@ -38,17 +38,6 @@ const PART_TYPE_IMAGES: Record<string, string> = {
   'spring': 'https://placehold.co/400x400/27ae60/ffffff?text=Spring',
 }
 
-const PART_TYPE_IMAGES: Record<string, string> = {
-  'alternator': 'https://www.carparts.com/blog/wp-content/uploads/2022/01/car-alternator.jpg',
-  'battery': 'https://www.carparts.com/blog/wp-content/uploads/2021/12/car-battery.jpg',
-  'filter': 'https://www.carparts.com/blog/wp-content/uploads/2020/07/oil-filter.jpg',
-  'spark plug': 'https://www.carparts.com/blog/wp-content/uploads/2020/07/spark-plug.jpg',
-  'brake': 'https://www.carparts.com/blog/wp-content/uploads/2020/07/brake-pads.jpg',
-  'belt': 'https://www.carparts.com/blog/wp-content/uploads/2020/07/drive-belt.jpg',
-  'pulley': 'https://www.carparts.com/blog/wp-content/uploads/2020/07/pulley.jpg',
-  'wiper': 'https://www.carparts.com/blog/wp-content/uploads/2020/07/wiper-blades.jpg',
-}
-
 export async function fetchPhotosForPart(partNameAr: string, partNameEn: string | null, partNumber: string | null, make: string, model: string, year: string, _category: string | null): Promise<PhotoResult[]> {
   const results: PhotoResult[] = []
 
