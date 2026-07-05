@@ -116,8 +116,28 @@ export async function getProvider(id: string) {
 
 export async function getProviderApiKey(id: string): Promise<string | null> {
   const [provider] = await db.select().from(aiProviders).where(eq(aiProviders.id, id))
-  if (!provider?.apiKey) return null
-  return decryptApiKeySafe(provider.apiKey)
+  if (!provider) return null
+
+  // Check if API key is stored in DB
+  if (provider.apiKey) {
+    return decryptApiKeySafe(provider.apiKey)
+  }
+
+  // Fall back to environment variables (Cloudflare secrets)
+  const envKeyMap: Record<string, string> = {
+    groq: 'GROQ_API_KEY',
+    groqcloud: 'GROQ_API_KEY',
+    gemini: 'GOOGLE_AI_API_KEY',
+    mistral: 'MISTRAL_API_KEY',
+    'nvidia-nim': 'NVIDIA_NIM_API_KEY',
+  }
+
+  const envKey = envKeyMap[provider.slug]
+  if (envKey && process.env[envKey]) {
+    return process.env[envKey]
+  }
+
+  return null
 }
 
 // ─── Model CRUD ───
@@ -283,8 +303,9 @@ export async function generateAIResponse(
   }
 
   if (!apiKey) {
+    // Try Cloudflare secrets first, then env vars
     apiKey = process.env.GROQ_API_KEY || ''
-    providerSlug = 'groq'
+    if (!apiKey) providerSlug = 'groq'
   }
 
   try {
@@ -458,6 +479,7 @@ async function callProviderAPI(
   // OpenAI-compatible providers (Groq, Mistral, Nvidia NIM)
   const endpointMap: Record<string, string> = {
     groq: 'https://api.groq.com/openai/v1/chat/completions',
+    groqcloud: 'https://api.groq.com/openai/v1/chat/completions',
     mistral: 'https://api.mistral.ai/v1/chat/completions',
     'nvidia-nim': 'https://integrate.api.nvidia.com/v1/chat/completions',
   }
