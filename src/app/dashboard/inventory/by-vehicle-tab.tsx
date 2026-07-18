@@ -104,7 +104,7 @@ function VehicleInventoryItems({ vehicleId, inventory, isLoading }: {
 }) {
   const { t } = useLanguage()
   const { data: vehicleParts } = trpc.vehicles.partsByVehicle.useQuery({ vehicleId }, { enabled: !!vehicleId })
-  const compatiblePartIds = vehicleParts?.map((vp: { parts: { id: string } }) => vp.parts.id) || []
+  const compatiblePartIds = vehicleParts?.map((vp: { compatibility?: { partId: string }; parts?: { id: string } }) => vp.parts?.id || vp.compatibility?.partId) || []
   const filteredItems = inventory.filter((item) => compatiblePartIds.includes(item.partId))
 
   if (isLoading) return <div className="h-20 animate-pulse rounded-xl bg-muted" />
